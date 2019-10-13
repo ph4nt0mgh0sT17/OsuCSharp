@@ -5,10 +5,18 @@ namespace OsuCSharp.ConsolePlayground
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            //System.Collections.Generic.List
-            Console.WriteLine("Hello World!");
+            LinkedList<int> linkedList = new LinkedList<int>();
+
+            Random rnd = new Random();
+
+            for (int i = 0; i < 50; i++)
+            {
+                linkedList.AddLast(rnd.Next(1, 101));
+            }
+
+            Console.ReadLine();
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
+﻿using System.Diagnostics;
 
 /// <summary>
 /// A namespace for all kinds data structures that exist.
@@ -34,13 +31,19 @@ namespace OsuCSharp.DataStructures
         { 
         }
 
+        /// <summary>
+        /// Creates the <see cref="LinkedList{T}"/> with values from given <b>collection</b>.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
         public LinkedList(IEnumerable<T> collection)
         {
+            // Checks if collection is not null
             if (collection == null)
             {
                 throw new ArgumentNullException(nameof(collection));
             }
 
+            // Adds every item from collection to the list
             foreach (T item in collection)
             {
                 AddLast(item);
@@ -51,27 +54,43 @@ namespace OsuCSharp.DataStructures
 
         #region Properties
 
+        /// <summary>
+        /// The count of items in the list.
+        /// </summary>
         public int Count
         {
-            get { return mCount; }
+            get => mCount;
         }
 
+        /// <summary>
+        /// The first node in the list.
+        /// </summary>
         public LinkedListNode<T> First
         {
-            get { return mHead; }
+            get => mHead;
         }
 
+        /// <summary>
+        /// The last node in the list.
+        /// </summary>
         public LinkedListNode<T> Last
         {
-            get 
-            {
-                return mHead == null ? null : mHead.Previous;
-            }
+            get => mHead == null ? null : mHead.Previous;
+            
         }
 
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Inserts a new node in the last place of the list.
+        /// </summary>
+        /// <param name="value">The value of new node.</param>
+        public void Add(T value)
+        {
+            AddLast(value);
+        }
 
         /// <summary>
         /// Creates a new node and inserts it after the given node.
@@ -200,6 +219,11 @@ namespace OsuCSharp.DataStructures
             newNode.mList = this;
         }
 
+        /// <summary>
+        /// Adds the new node with given <b>value</b> as last item in the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>The new node.</returns>
         public LinkedListNode<T> AddLast(T value)
         {
             // Creates the new node
@@ -217,9 +241,14 @@ namespace OsuCSharp.DataStructures
                 InternalInsertNodeBefore(mHead, newNode);
             }
 
+            // Returns created node
             return newNode;
         }
 
+        /// <summary>
+        /// Adds the <b>newNode</b> as last item in the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="newNode">The new created node.</param>
         public void AddLast(LinkedListNode<T> newNode)
         {
             // Creates the new node
@@ -237,6 +266,7 @@ namespace OsuCSharp.DataStructures
                 InternalInsertNodeBefore(mHead, newNode);
             }
 
+            // Attaches this list as the list of the new node
             newNode.mList = this;
         }
 
@@ -258,6 +288,90 @@ namespace OsuCSharp.DataStructures
             mCount = 0;
             mVersion++;
         }
+
+        /// <summary>
+        /// Checks if the <see cref="LinkedList{T}"/> does containt the given <b>value</b>.
+        /// </summary>
+        /// <param name="value">The value in the list.</param>
+        /// <returns>The state.</returns>
+        public bool Contains(T value)
+        {
+            return Find(value) != null;
+        }
+
+        /// <summary>
+        /// <para>
+        /// Finds the <see cref="LinkedListNode{T}"/> by given <b>value</b>.
+        /// </para>
+        /// 
+        /// <para>
+        /// If <see cref="LinkedListNode{T}"/> is not found, <b>null</b> is returned.
+        /// </para>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public LinkedListNode<T> Find(T value)
+        {
+            LinkedListNode<T> node = mHead;
+
+            // Comparer of the values
+            EqualityComparer<T> comparer = EqualityComparer<T>.Default;
+
+            if (node != null)
+            {
+                do
+                {
+                    // Compares the values and if true returns the node
+                    if (comparer.Equals(node!.mItem, value))
+                    {
+                        return node;
+                    }
+
+                    // Iterates to the next node until headNode
+                    node = node.mNext;
+
+                } while (node != mHead);
+            }
+
+            // Returns null if node is not found
+            return null;
+
+        }
+
+        /// <summary>
+        /// Gets the value of <see cref="LinkedListNode{T}"/> at given <b>index</b>.
+        /// </summary>
+        /// <param name="index">The index of the <see cref="LinkedListNode{T}"/>.</param>
+        /// <returns>The value.</returns>
+        public T Get(int index)
+        {
+            LinkedListNode<T> node = mHead;
+            int internalIndex = 0;
+
+            if (node != null)
+            {
+                do
+                {
+                    // Checks if there is reached index
+                    if (internalIndex == index)
+                    {
+                        return node.Value;
+                    }
+
+                    // Iterates to the next node
+                    node = node.mNext;
+                    internalIndex++;
+
+                }                 
+                while (node != mHead);
+            }
+
+            // If there is not given index, throws the exception
+            throw new IndexOutOfRangeException("The current index is not in the list.");
+        }
+
+        #region Helper methods
 
         /// <summary>
         /// Validates the node if not null or has attached wrong <see cref="LinkedList{T}"/>.
@@ -323,7 +437,7 @@ namespace OsuCSharp.DataStructures
             mCount++;
         }
 
-
+        #endregion
 
         #endregion
 
