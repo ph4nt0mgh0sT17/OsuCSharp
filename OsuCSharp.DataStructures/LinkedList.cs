@@ -37,15 +37,14 @@ namespace OsuCSharp.DataStructures
         /// <param name="collection">The collection.</param>
         public LinkedList(IEnumerable<T> collection)
         {
-            // Checks if collection is not null
             if (collection == null)
             {
                 throw new ArgumentNullException(nameof(collection));
             }
 
-            // Adds every item from collection to the list
             foreach (T item in collection)
             {
+                // Adds as the last item
                 AddLast(item);
             }
         }
@@ -89,6 +88,7 @@ namespace OsuCSharp.DataStructures
         /// <param name="value">The value of new node.</param>
         public void Add(T value)
         {
+            // Adds as the last item in the list
             AddLast(value);
         }
 
@@ -100,14 +100,12 @@ namespace OsuCSharp.DataStructures
         /// <returns>The created new node.</returns>
         public LinkedListNode<T> AddAfter(LinkedListNode<T> node, T value)
         {
-            // Validates the node if is proper
             ValidateNode(node);
 
             // Creates new node and inserts it
-            LinkedListNode<T> newNode = new LinkedListNode<T>(node.List!, value);
+            LinkedListNode<T> newNode = new LinkedListNode<T>(node.List, value);
             InternalInsertNodeBefore(node.Next!, newNode);
 
-            // Returns the new node
             return newNode;
         }
 
@@ -118,7 +116,6 @@ namespace OsuCSharp.DataStructures
         /// <param name="newNode">The new node.</param>
         public void AddAfter(LinkedListNode<T> node, LinkedListNode<T> newNode)
         {
-            // Validates the node if are proper
             ValidateNode(node);
             ValidateNewNode(newNode);
 
@@ -133,20 +130,17 @@ namespace OsuCSharp.DataStructures
         /// <param name="value">The value of new node.</param>
         public LinkedListNode<T> AddBefore(LinkedListNode<T> node, T value)
         {
-            // Validates the node
             ValidateNode(node);
 
             // Creates a new node and inserts it before the given node
             LinkedListNode<T> newNode = new LinkedListNode<T>(this, value);
             InternalInsertNodeBefore(node, newNode);
 
-            // Checks if the given node is head
             if (node == mHead)
             {
                 mHead = newNode;
             }
 
-            // Returns the created node
             return newNode;
         }
 
@@ -157,15 +151,14 @@ namespace OsuCSharp.DataStructures
         /// <param name="newNode">The new node.</param>
         public void AddBefore(LinkedListNode<T> node, LinkedListNode<T> newNode)
         {
-            // Validates the nodes
             ValidateNode(node);
             ValidateNewNode(newNode);
 
-            // Creates a new node and inserts it before the given node
             InternalInsertNodeBefore(node, newNode);
+
+            // Attach this list to the new node
             newNode.mList = this;
 
-            // Checks if the given node is head
             if (node == mHead)
             {
                 mHead = newNode;
@@ -179,7 +172,7 @@ namespace OsuCSharp.DataStructures
         /// <returns>The create new node.</returns>
         public LinkedListNode<T> AddFirst(T value)
         {
-            // Creates the node
+            // Creates the new node
             LinkedListNode<T> newNode = new LinkedListNode<T>(this, value);
 
             if (mHead == null)
@@ -202,7 +195,6 @@ namespace OsuCSharp.DataStructures
         /// <param name="newNode">The given new node.</param>
         public void AddFirst(LinkedListNode<T> newNode)
         {
-            // Validates the new node
             ValidateNewNode(newNode);
 
             if (mHead == null)
@@ -229,19 +221,16 @@ namespace OsuCSharp.DataStructures
             // Creates the new node
             LinkedListNode<T> newNode = new LinkedListNode<T>(this, value);
 
-            // Checks if head is null
             if (mHead == null)
             {
                 InternalInsertNodeToEmptyList(newNode);
             }
 
-            // Inserts into non-empty list
             else
             {
                 InternalInsertNodeBefore(mHead, newNode);
             }
 
-            // Returns created node
             return newNode;
         }
 
@@ -251,22 +240,19 @@ namespace OsuCSharp.DataStructures
         /// <param name="newNode">The new created node.</param>
         public void AddLast(LinkedListNode<T> newNode)
         {
-            // Creates the new node
             ValidateNewNode(newNode);
 
-            // Checks if head is null
             if (mHead == null)
             {
                 InternalInsertNodeToEmptyList(newNode);
             }
 
-            // Inserts into non-empty list
             else
             {
                 InternalInsertNodeBefore(mHead, newNode);
             }
 
-            // Attaches this list as the list of the new node
+            // Attaches this list to the new node
             newNode.mList = this;
         }
 
@@ -279,15 +265,15 @@ namespace OsuCSharp.DataStructures
 
             while (current != null)
             {
-                LinkedListNode<T> temp = current;
-                current = current.Next;
-                temp.Invalidate();
+                DeleteNode(ref current);
             }
 
             mHead = null;
             mCount = 0;
             mVersion++;
         }
+
+
 
         /// <summary>
         /// Checks if the <see cref="LinkedList{T}"/> does containt the given <b>value</b>.
@@ -315,26 +301,26 @@ namespace OsuCSharp.DataStructures
         {
             LinkedListNode<T> node = mHead;
 
-            // Comparer of the values
+            // Comparer for the values
             EqualityComparer<T> comparer = EqualityComparer<T>.Default;
 
             if (node != null)
             {
                 do
                 {
-                    // Compares the values and if true returns the node
+                    // We can compare the values via EqualityComparer
                     if (comparer.Equals(node!.mItem, value))
                     {
                         return node;
                     }
 
-                    // Iterates to the next node until headNode
+                    // Iterates to the next node
                     node = node.mNext;
 
                 } while (node != mHead);
             }
 
-            // Returns null if node is not found
+            
             return null;
 
         }
@@ -346,14 +332,17 @@ namespace OsuCSharp.DataStructures
         /// <returns>The value.</returns>
         public T Get(int index)
         {
+
             LinkedListNode<T> node = mHead;
-            int internalIndex = 0;
+
+            // Internal index for iterating through whole list
+            int internalIndex = 0; 
 
             if (node != null)
             {
                 do
                 {
-                    // Checks if there is reached index
+                    
                     if (internalIndex == index)
                     {
                         return node.Value;
@@ -364,10 +353,10 @@ namespace OsuCSharp.DataStructures
                     internalIndex++;
 
                 }                 
-                while (node != mHead);
+                while (node != mHead); // Circular list
             }
 
-            // If there is not given index, throws the exception
+            
             throw new IndexOutOfRangeException("The current index is not in the list.");
         }
 
@@ -420,7 +409,6 @@ namespace OsuCSharp.DataStructures
             node.mPrevious!.mNext = newNode;
             node.mPrevious = newNode;
 
-            // Incrementation of version and count
             mVersion++;
             mCount++;
         }
@@ -429,12 +417,20 @@ namespace OsuCSharp.DataStructures
         {
             Debug.Assert(mHead == null && mCount == 0, "LinkedList must be empty when this method is called!");
 
+            // Makes a head of the list
             newNode.mNext = newNode;
             newNode.mPrevious = newNode;
             mHead = newNode;
 
             mVersion++;
             mCount++;
+        }
+
+        private void DeleteNode(ref LinkedListNode<T> current)
+        {
+            LinkedListNode<T> temp = current;
+            current = current.Next;
+            temp.Invalidate();
         }
 
         #endregion
@@ -489,7 +485,7 @@ namespace OsuCSharp.DataStructures
         /// </summary>
         public LinkedList<T> List
         {
-            get { return mList; }
+            get => mList;
         }
 
         /// <summary>
@@ -497,10 +493,7 @@ namespace OsuCSharp.DataStructures
         /// </summary>
         public LinkedListNode<T> Next
         {
-            get
-            {
-                return mNext == null || mNext == mList!.mHead ? null : mNext;
-            }
+            get => mNext == null || mNext == mList!.mHead ? null : mNext;
         }
 
         /// <summary>
@@ -508,10 +501,7 @@ namespace OsuCSharp.DataStructures
         /// </summary>
         public LinkedListNode<T> Previous
         {
-            get
-            {
-                return mPrevious == null || this == mList!.mHead ? null : mPrevious;
-            }
+            get => mPrevious == null || this == mList!.mHead ? null : mPrevious;
         }
 
         /// <summary>
@@ -519,15 +509,8 @@ namespace OsuCSharp.DataStructures
         /// </summary>
         public T Value
         {
-            get
-            {
-                return mItem;
-            }
-
-            set
-            {
-                mItem = value;
-            }
+            get => mItem;
+            set => mItem = value;
         }
 
         #endregion
